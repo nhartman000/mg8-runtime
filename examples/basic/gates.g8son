@@ -1,0 +1,22 @@
+{
+  "g8son_version": "1.0",
+  "file_id": "basic.conditions",
+  "gates": [
+    {
+      "gate_id": "answer.nonempty",
+      "type": "AND",
+      "conditions": [
+        {
+          "path": "/candidate/answer",
+          "op": "ne",
+          "value": ""
+        }
+      ],
+      "outcomes": {
+        "PASS": "commit",
+        "FAIL": "reject",
+        "INTERMEDIATE": "review"
+      }
+    }
+  ]
+}

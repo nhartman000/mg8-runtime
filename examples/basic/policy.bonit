@@ -1,0 +1,12 @@
+{
+  "bonit_profile": "mg8-runtime/0.1",
+  "actors": [
+    "agent"
+  ],
+  "writable_paths": [
+    "/answer"
+  ],
+  "max_attempts": 3,
+  "max_seconds": 10,
+  "max_commits": 1
+}

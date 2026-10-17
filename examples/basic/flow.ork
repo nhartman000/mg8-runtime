@@ -1,0 +1,7 @@
+{
+  "ork_profile": "mg8-runtime-sequential/0.1",
+  "bonit": "policy.bonit",
+  "flow": [
+    "answer.nonempty"
+  ]
+}

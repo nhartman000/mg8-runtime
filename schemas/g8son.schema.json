@@ -1,0 +1,78 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "G8SON — Gate Sequential Object Notation",
+  "description": "Schema for a bounded .g8son file containing one to three conditional gates.",
+  "type": "object",
+  "additionalProperties": false,
+  "properties": {
+    "g8son_version": {
+      "type": "string",
+      "minLength": 1
+    },
+    "file_id": {
+      "type": "string",
+      "minLength": 1
+    },
+    "gates": {
+      "type": "array",
+      "minItems": 1,
+      "maxItems": 3,
+      "items": {
+        "$ref": "#/definitions/gate"
+      }
+    },
+    "metadata": {
+      "type": "object",
+      "additionalProperties": true
+    }
+  },
+  "required": ["g8son_version", "file_id", "gates"],
+  "definitions": {
+    "gate": {
+      "type": "object",
+      "additionalProperties": true,
+      "properties": {
+        "gate_id": {
+          "type": "string",
+          "minLength": 1
+        },
+        "order": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "type": {
+          "type": "string",
+          "minLength": 1
+        },
+        "conditions": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "anyOf": [
+              { "type": "string" },
+              { "type": "object" }
+            ]
+          }
+        },
+        "outcomes": {
+          "type": "object",
+          "properties": {
+            "PASS": { "type": ["string", "object", "null"] },
+            "FAIL": { "type": ["string", "object", "null"] },
+            "INTERMEDIATE": { "type": ["string", "object", "null"] }
+          },
+          "additionalProperties": false
+        },
+        "precedent": {},
+        "dialogue_injection": {},
+        "overrides": {},
+        "human_decision": {},
+        "metadata": {
+          "type": "object",
+          "additionalProperties": true
+        }
+      },
+      "required": ["gate_id", "type", "conditions"]
+    }
+  }
+}

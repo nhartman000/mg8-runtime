@@ -1,0 +1,12 @@
+{
+  "mg8_version": "1.0",
+  "unit_id": "basic.local-answer",
+  "entry": "flow.ork",
+  "state": [
+    "state.gst"
+  ],
+  "gates": [
+    "gates.g8son"
+  ],
+  "trace": "trace/run.qson"
+}

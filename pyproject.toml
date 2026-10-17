@@ -1,0 +1,23 @@
+[build-system]
+requires = ["setuptools>=77"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "mg8-runtime"
+version = "0.1.0"
+description = "Runtime-enforced MG8 proposals, G8SON logic, permits, and audited commits"
+readme = "README.md"
+requires-python = ">=3.11"
+authors = [{name = "Nicholas Hartman"}]
+license = "Apache-2.0"
+license-files = ["LICENSE"]
+dependencies = ["cloudpickle>=3.0"]
+
+[project.optional-dependencies]
+test = ["jsonschema>=4.20", "build>=1.2"]
+
+[project.scripts]
+mg8-runtime = "mg8_runtime.cli:main"
+
+[tool.setuptools.packages.find]
+where = ["src"]

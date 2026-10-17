@@ -1,0 +1,5 @@
+include README.md LICENSE SECURITY.md
+recursive-include docs *.md
+recursive-include schemas *.json
+recursive-include examples *.mg8 *.ork *.bonit *.gst *.g8son *.json
+recursive-include tests *.py
