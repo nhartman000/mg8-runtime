@@ -15,9 +15,17 @@ dependencies = ["cloudpickle>=3.0"]
 
 [project.optional-dependencies]
 test = ["jsonschema>=4.20", "build>=1.2"]
+# NYCH is supplied as a separately pinned wheel; do not resolve an unpinned source.
+integration = ["jsonschema>=4.20"]
 
 [project.scripts]
 mg8-runtime = "mg8_runtime.cli:main"
 
 [tool.setuptools.packages.find]
 where = ["src"]
+
+[tool.setuptools.package-data]
+mg8_runtime = ["schemas/*.json"]
+
+[tool.setuptools.data-files]
+"share/mg8-runtime/schemas" = ["schemas/g8son.schema.json", "schemas/qson.schema.json"]

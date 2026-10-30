@@ -1,0 +1,11 @@
+name: pinned-nych-integration
+on:
+  push:
+  pull_request:
+permissions:
+  contents: read
+jobs:
+  nych-integration:
+    uses: ./.github/workflows/nych-integration.yml
+    with:
+      nych-ref: '57b81e9220069dd5ff72197b41288c9613e3343b'

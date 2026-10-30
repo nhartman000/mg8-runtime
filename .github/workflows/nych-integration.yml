@@ -1,0 +1,58 @@
+name: clean-wheel-nych-integration
+# Caller supplies the published NYCH packaging-fix revision, not a moving branch.
+on:
+  workflow_dispatch:
+    inputs:
+      nych-ref:
+        description: 'Full published NYCH commit (must include nych.schemas wheel fix)'
+        required: true
+        type: string
+  workflow_call:
+    inputs:
+      nych-ref:
+        required: true
+        type: string
+permissions:
+  contents: read
+jobs:
+  clean-install:
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        python: ['3.11', '3.12', '3.13', '3.14']
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          path: runtime
+      - uses: actions/setup-python@v5
+        with:
+          python-version: ${{ matrix.python }}
+      - name: Require immutable dependency revision
+        env:
+          NYCH_REF: ${{ inputs.nych-ref }}
+        run: python -c 'import os,re,sys; re.fullmatch("[0-9a-f]{40}", os.environ["NYCH_REF"]) or sys.exit("NYCH ref must be a full commit SHA")'
+      - uses: actions/checkout@v4
+        with:
+          repository: nhartman000/nych
+          ref: ${{ inputs.nych-ref }}
+          path: nych-source
+      - run: python -m pip install 'build>=1.2'
+      - name: Build NYCH wheel (no editable installation)
+        run: python -m build --wheel --outdir "$RUNNER_TEMP/nych-wheels" nych-source
+      - name: Test sdist-built runtime wheel in a fresh isolated environment
+        run: |
+          set -- "$RUNNER_TEMP"/nych-wheels/*.whl
+          test "$#" -eq 1
+          python runtime/tools/check_wheel_install.py --nych-wheel "$1" --output "$RUNNER_TEMP/clean-install"
+        env:
+          PYTHONDONTWRITEBYTECODE: '1'
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: nych-integration-${{ matrix.python }}
+          path: |
+            ${{ runner.temp }}/clean-install/result.json
+            ${{ runner.temp }}/clean-install/pass/*
+            ${{ runner.temp }}/clean-install/fail/*
+            ${{ runner.temp }}/clean-install/unknown/*
