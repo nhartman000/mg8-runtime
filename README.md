@@ -51,6 +51,25 @@ The output directory must not exist. The demo preserves authored requirement tex
 
 The definition is checked against a declared reviewed reference. The demo does not pretend to implement a general scientific-truth evaluator, call a model, or reproduce the historical MGate Keeper experiment.
 
+## NYCH → M-Gate → bounded MG8 effect → QSON
+
+An optional offline integration calls the real NYCH semantic encoder and
+`nych.gates.AtomicRequirement`, admits an exact file operation through the real
+runtime, freshly observes its result, commits, and verifies persisted evidence
+and final bytes in an independent process:
+
+```sh
+# Install this wheel's integration extra and a packaging-fixed NYCH wheel first.
+python -m mg8_runtime.nych_demo run ./nych-pass
+python -m mg8_runtime.nych_verify ./nych-pass
+```
+
+[Integration instructions and profile boundaries](docs/NYCH_INTEGRATION.md)
+include FAIL/UNKNOWN runs, tamper tests, source fingerprints, and clean-wheel CI.
+This is a mechanical one-unit demonstration, not model inference or the full
+NYCH three-gate trajectory system. No source formats or canonical schemas are
+migrated.
+
 ## Run a resource-bound unit
 
 ```sh
