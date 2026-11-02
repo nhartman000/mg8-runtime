@@ -1,0 +1,15 @@
+cff-version: 1.2.0
+message: "If you use this software, please cite it as below."
+type: software
+title: "mg8-runtime (MG8 family): Runtime-enforced MG8 agent proposals, G8SON logic gates, permits, state commits, and QSON evidence"
+authors:
+  - given-names: Nicholas C.
+    family-names: Hartman
+    affiliation: American Milestone Inc
+repository-code: "https://github.com/nhartman000/mg8-runtime"
+license: Apache-2.0
+keywords:
+  - deterministic AI
+  - MG8
+  - NYCH
+  - high-assurance AI
