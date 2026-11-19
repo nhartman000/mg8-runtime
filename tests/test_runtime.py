@@ -39,6 +39,18 @@ class RuntimeTests(unittest.TestCase):
         self.assertEqual(self.runtime.evaluate(proposal)['outcome'], 'PASS')
         return self.runtime.authorize(proposal)
 
+    def test_evaluation_does_not_serialize_the_runtime_or_its_clock(self):
+        # Regression: the evaluation closure once captured `self`, so cloudpickle shipped the
+        # whole Runtime (and its injected clock) to the spawned worker. An unpicklable clock
+        # (e.g. one capturing a pytest TestCase) then made every evaluation fail closed.
+        import threading
+        lock = threading.Lock()  # locks cannot be pickled
+        runtime = self.api.Runtime(self.path.with_name('unpicklable.sqlite'), self.registry,
+                                   clock=lambda: (lock, self.now)[1])
+        run = runtime.create_run({'verified': False}, [gates()], actors=['agent'], writable_paths=['/verified'])
+        proposal = runtime.propose(run, 'agent', {'verified': True}, base_version=0)
+        self.assertEqual(runtime.evaluate(proposal)['outcome'], 'PASS')
+
     def test_pass_commits_and_survives_reopen(self):
         run = self.create()
         permit = self.permit(run)

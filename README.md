@@ -36,6 +36,19 @@ python -m pip install -e '.[test]'
 
 There are no provider credentials required. `cloudpickle` serializes only trusted host callbacks into deadline-limited spawned processes; serialized agent input is never accepted. `jsonschema` and `build` are test/build dependencies.
 
+## Run the tests
+
+```sh
+python -m unittest discover -s tests          # the CI command
+python -m pytest -q                           # also works
+```
+
+Host callbacks (gate evaluators, effect adapters, proposers) run in a spawned worker process and are
+serialized with `cloudpickle`. A callback must therefore be picklable: do not close over objects such as a
+test-case instance, locks, sockets, generators or database connections. If a callback cannot be serialized,
+evaluation fails closed with `INTERMEDIATE` (never `PASS`). The 17 skipped tests need the separately pinned
+NYCH wheel (see the integration section).
+
 ## Run the offline demo
 
 ```sh
