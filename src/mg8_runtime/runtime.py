@@ -311,10 +311,15 @@ class Runtime(EffectsMixin):
         if exhausted:
             raise AdmissionError('loop bound exhausted: UNRESOLVED')
 
+        # Bind only what the worker needs. A closure over `self` would make cloudpickle
+        # serialize the whole Runtime (including its injected clock, which may capture
+        # unpicklable host state such as a pytest TestCase) into the spawned process.
+        registry = self.registry
+
         def compute():
             admissibility = None
             if run['policy']['admissibility_ref']:
-                result = self.registry.evaluate({'evaluator_ref': run['policy']['admissibility_ref'],
+                result = registry.evaluate({'evaluator_ref': run['policy']['admissibility_ref'],
                                                  'requirement': 'declared trajectory admissibility'}, context)
                 result_name = result.outcome.value
                 mapped = 'INTERMEDIATE' if result_name == 'UNKNOWN' else result_name
@@ -322,7 +327,7 @@ class Runtime(EffectsMixin):
                 if mapped != 'PASS':
                     return {'outcome': mapped, 'gates': [], 'admissibility': admissibility}
             gate_key = 'gates' if phase == 'commit' else 'effect_gates'
-            reports = [GateSet(g['document'], g['bindings']).evaluate(context, self.registry)
+            reports = [GateSet(g['document'], g['bindings']).evaluate(context, registry)
                        for g in run['policy'][gate_key]]
             all_gates = [g for r in reports for g in r['gates']]
             results = [r['outcome'] for r in reports]

@@ -56,10 +56,11 @@ class BoundaryTests(unittest.TestCase):
 
     def test_cancelled_inflight_evaluation_cannot_return_authority(self):
         marker = self.path / 'started'
+        logic = self.logic  # bind locally: callbacks run in a spawned process and must be picklable
         def callback(context, condition):
             marker.write_text('started')
             time.sleep(0.25)
-            return self.logic.Evaluation(self.logic.Outcome.PASS, 'would pass')
+            return logic.Evaluation(logic.Outcome.PASS, 'would pass')
         run, p = self.run_with_callback(callback)
         reports = []
         worker = threading.Thread(target=lambda: reports.append(self.runtime.evaluate(p)))
@@ -80,16 +81,18 @@ class BoundaryTests(unittest.TestCase):
         p = self.runtime.propose(run, 'agent', {'verified': True}, base_version=0)
         self.runtime.evaluate(p)
         permit = self.runtime.authorize(p)
-        self.registry.register('new@1', lambda c, r: self.logic.Evaluation(self.logic.Outcome.PASS, 'new implementation'))
+        logic = self.logic
+        self.registry.register('new@1', lambda c, r: logic.Evaluation(logic.Outcome.PASS, 'new implementation'))
         with self.assertRaises(self.api.AdmissionError):
             self.runtime.commit(permit)
 
     def test_inadmissible_candidate_never_reaches_gate_assessor(self):
         marker = self.path / 'must-not-assess'
-        self.registry.register('admissibility@1', lambda c, r: self.logic.Evaluation(self.logic.Outcome.FAIL, 'outside active constraints'))
+        logic = self.logic
+        self.registry.register('admissibility@1', lambda c, r: logic.Evaluation(logic.Outcome.FAIL, 'outside active constraints'))
         def assess(context, condition):
             marker.write_text('assessed')
-            return self.logic.Evaluation(self.logic.Outcome.PASS, 'must not bypass narrowing')
+            return logic.Evaluation(logic.Outcome.PASS, 'must not bypass narrowing')
         run, p = self.run_with_callback(assess, admissibility_ref='admissibility@1')
         self.assertEqual(self.runtime.evaluate(p)['outcome'], 'FAIL')
         self.assertFalse(marker.exists(), 'required narrowing must run before gate assessment')

@@ -29,8 +29,9 @@ class EffectTests(unittest.TestCase):
         return run, proposal
 
     def test_pre_effect_permission_is_not_postcondition_evidence(self):
+        marker = self.marker  # bind locally: adapters run in a spawned process and must be picklable
         def adapter(args, operation_id):
-            self.marker.write_text(args['value'])
+            marker.write_text(args['value'])
             return {'operation_id': operation_id, 'written': True}
         run, proposal = self.setup_operation(adapter)
         self.assertEqual(self.runtime.evaluate(proposal)['outcome'], 'INTERMEDIATE')
@@ -49,8 +50,9 @@ class EffectTests(unittest.TestCase):
 
     def test_timeout_is_ambiguous_and_not_retried(self):
         import time
+        marker = self.marker
         def adapter(args, operation_id):
-            self.marker.write_text('effect happened before timeout')
+            marker.write_text('effect happened before timeout')
             time.sleep(2)
         run, proposal = self.setup_operation(adapter)
         self.runtime.evaluate(proposal, phase='effect')
@@ -68,8 +70,9 @@ class EffectTests(unittest.TestCase):
         self.runtime.commit(self.runtime.authorize(proposal))
 
     def test_adapter_failure_records_possible_partial_effect(self):
+        marker = self.marker
         def adapter(args, operation_id):
-            self.marker.write_text('partial')
+            marker.write_text('partial')
             raise RuntimeError('remote connection interrupted')
         run, proposal = self.setup_operation(adapter)
         self.runtime.evaluate(proposal, phase='effect')
